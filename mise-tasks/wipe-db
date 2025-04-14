@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+#MISE description="Wipe the local database"
+
+import os
+from dotenv import load_dotenv
+import psycopg
+from urllib.parse import urlparse
+
+load_dotenv()
+
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    parsed = urlparse(db_url)
+    username = parsed.username
+    password = parsed.password
+    hostname = parsed.hostname
+    port = parsed.port or 5432  # default to 5432 if no port specified
+    dbname = parsed.path.lstrip('/')  # remove leading slash
+    conn = psycopg.connect(
+        dbname=dbname,
+        user=username,
+        password=password,
+        host=hostname,
+        port=port
+    )
+else:
+    # Fallback to default local connection if no DATABASE_URL is set
+    conn = psycopg.connect("dbname=postgres user=postgres password=postgres host=localhost port=5433")
+
+conn.execute("DROP SCHEMA public CASCADE;CREATE SCHEMA public")
+conn.commit()
+print("Database wiped successfully")

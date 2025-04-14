@@ -1,0 +1,23 @@
+[tools]
+python = ["3.13.2"]
+
+[env]
+_.python.venv = ".venv" # .venv works best with uv
+PYTHONPATH="src"
+
+[tasks.lint]
+description = "Lint the repo"
+run = """
+uv run black src test 
+ruff check src test --fix
+lint-imports
+"""
+
+
+[tasks.clean]
+description = "Remove Python build artifacts, cache files, and temporary files from src and test directories"
+run = """
+find src test -type d -name __pycache__ -exec rm -rf {} +
+find src test -type f -name '*.py[cod]' -exec rm -f {} +
+find src test -type d -name '.pytest_cache' -exec rm -rf {} +
+"""

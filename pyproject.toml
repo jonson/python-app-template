@@ -1,0 +1,60 @@
+[project]
+name = "python-base-template"
+version = "0.1.0"
+description = "Base FastAPI application"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.15.2",
+    "click>=8.1.8",
+    "fastapi[standard]>=0.115.12",
+    "psycopg[binary,pool]>=3.2.6",
+    "python-ulid>=3.0.0",
+    "sqlalchemy>=2.0.40",
+    "sqlmodel>=0.0.24",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.1.0",
+    "import-linter>=2.3",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+    "ruff>=0.11.5",
+    "testcontainers>=4.10.0",
+]
+
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+asyncio_default_fixture_loop_scope = "function"
+
+
+[tool.importlinter]
+root_package = 'app'
+include_external_packages = true
+exclude_type_checking_imports = true
+
+
+[[tool.importlinter.contracts]]
+name = 'Service and model layers'
+type = 'layers'
+layers = [
+    "app.service",
+    "app.model"
+]
+
+[[tool.importlinter.contracts]]
+name = 'entry-point leakage'
+type = 'forbidden'
+# entry points (api, cmd, ..) should not be imported in service of model layers
+source_modules = [
+    "app.service",
+    "app.model"
+]
+forbidden_modules = [
+    "app.api",
+    "app.cmd"
+]
